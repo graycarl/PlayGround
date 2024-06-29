@@ -1,0 +1,35 @@
+Testing environment:
+  Python: 3.10.9 (main, Feb 15 2023, 23:59:34) [Clang 14.0.0 (clang-1400.0.29.202)]
+  Msgspec: 0.18.6
+Pickle + Plain:
+  Size: 684992
+  Serialize: 0.2521913340315223
+  Deserialize: 0.14497816702350974
+Pickle + Dataclass:
+  Size: 684980
+  Serialize: 0.2614145828410983
+  Deserialize: 0.14711349993012846
+Msgspec[json] + Dataclass:
+  Size: 767468
+  Serialize: 0.048508499981835485
+  Deserialize: 0.10548324999399483
+Msgspec[json] + Struct:
+  Size: 767465
+  Serialize: 0.028917417163029313
+  Deserialize: 0.059929917100816965
+Msgspec[json] + Struct (no GC):
+  Size: 767464
+  Serialize: 0.03301974991336465
+  Deserialize: 0.05837416718713939
+Msgspec[msgpack] + Dataclass:
+  Size: 718020
+  Serialize: 0.037255666218698025
+  Deserialize: 0.09986991691403091
+Msgspec[msgpack] + Struct:
+  Size: 717979
+  Serialize: 0.026222291868180037
+  Deserialize: 0.05343533307313919
+Msgspec[msgpack] + Struct (no GC):
+  Size: 717970
+  Serialize: 0.02247945894487202
+  Deserialize: 0.05138750001788139

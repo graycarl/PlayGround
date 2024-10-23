@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS data;
+CREATE TABLE data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name TEXT,
+    created_on TIMESTAMP
+);

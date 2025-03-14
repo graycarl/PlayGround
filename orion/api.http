@@ -1,0 +1,37 @@
+@urlbase=http://localhost:10101
+@apibase={{urlbase}}/public-api/v1
+@auth=Basic admin@veeva.com:kpKaLt#H
+
+###
+
+GET {{apibase}}/
+Authorization: {{auth}}
+
+### GET LIST
+
+# @name first_page
+GET {{apibase}}/objects/geography/records
+Authorization: {{auth}}
+
+###
+
+# @name second_page
+GET {{first_page.response.body.$.links.next}}
+Authorization: {{auth}}
+
+### SINGLE OPERATION
+
+GET {{apibase}}/objects/geography/records/2da481bd-36c6-11e7-a5a4-784f43949f5b
+Authorization: {{auth}}
+
+### 
+
+PUT {{apibase}}/objects/geography/records/2da481bd-36c6-11e7-a5a4-784f43949f5b
+Authorization: {{auth}}
+
+
+###
+
+# GET job
+GET {{apibase}}/jobs
+Authorization: {{auth}}

@@ -28,10 +28,51 @@ Authorization: {{auth}}
 
 PUT {{apibase}}/objects/geography/records/2da481bd-36c6-11e7-a5a4-784f43949f5b
 Authorization: {{auth}}
+Content-Type: application/json
 
+{
+  "data": {
+    "id": "2da481bd-36c6-11e7-a5a4-784f43949f5b",
+    "type": "geography",
+    "fields": {
+      "external_id": "xxx"
+    }
+  }
+}
 
 ###
 
 # GET job
 GET {{apibase}}/jobs
+Authorization: {{auth}}
+
+###
+
+# Export job
+# @name exportjob
+POST {{apibase}}/jobs
+Authorization: {{auth}}
+Content-Type: application/json
+
+{
+    "data": {
+        "fields": {
+            "type": "data.export",
+            "details": {
+                "serializer": "public-api-v1/csv",
+                "exports": [{
+                    "name": "geos",
+                    "fields": ["$all_light_fields"],
+                    "object_name": "geography"
+                }]
+            }
+        }
+    }
+}
+
+###
+
+# Get Job Info
+# @name exportjob
+GET {{apibase}}/jobs/{{exportjob.response.body.$.data.id}}
 Authorization: {{auth}}

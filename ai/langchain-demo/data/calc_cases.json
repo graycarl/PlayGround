@@ -1,0 +1,122 @@
+[
+  {
+    "input": "计算123加456减78",
+    "expected_output": "123加456减78的结果是495",
+    "description": "测试基础加减混合运算",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "56乘以78等于多少",
+    "expected_output": "56乘以78的结果是4368",
+    "description": "测试整数乘法运算",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "987除以3的商是多少",
+    "expected_output": "987除以3的商是329",
+    "description": "测试整除运算",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "计算(3.14×2.5)+(1.5÷0.5)",
+    "expected_output": "(3.14×2.5)+(1.5÷0.5)的结果是10.85",
+    "description": "测试小数混合运算及括号优先级",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "1/3加上2/5等于多少（用分数表示）",
+    "expected_output": "1/3加上2/5的结果是11/15",
+    "description": "测试分数加法运算",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "75%的200是少",
+    "expected_output": "75%的200是150",
+    "description": "测试百分比计算",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "计算15的平方减去10的立方",
+    "expected_output": "15的平方减去10的立方的结果是-775",
+    "description": "测试指数运算和负数结果处理",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "√64加上√81等于多少",
+    "expected_output": "√64加上√81的结果是17",
+    "description": "测试平方根运算",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "将150厘米转换为米",
+    "expected_output": "150厘米等于1.5米",
+    "description": "测试单位换算（厘米转米）",
+    "category": "单位换算与转换"
+  },
+  {
+    "input": "华氏98.6度等于多少摄氏度",
+    "expected_output": "华氏98.6度等于37摄氏度",
+    "description": "测试温度单位换算（华氏转摄氏）",
+    "category": "单位换算与转换"
+  },
+  {
+    "input": "2023年1月1日到2023年12月31日有多少天",
+    "expected_output": "2023年1月1日到2023年12月31日有365天",
+    "description": "测试非闰年全年天数计算",
+    "category": "单位换算与转换"
+  },
+  {
+    "input": "从下午2点30分开始，过150分钟是几点几分",
+    "expected_output": "从下午2点30分开始，过150分钟是下午5点0分",
+    "description": "测试时间加法运算（分钟转小时）",
+    "category": "单位换算与转换"
+  },
+  {
+    "input": "计算10、20、30、40的平均值",
+    "expected_output": "10、20、30、40的平均值是25",
+    "description": "测试平均值计算",
+    "category": "统计与数学概念"
+  },
+  {
+    "input": "找出50、35、78、22中的最大值和最小值",
+    "expected_output": "50、35、78、22中的最大值是78，最小值是22",
+    "description": "测试极值查找（最大/最小）",
+    "category": "统计与数学概念"
+  },
+  {
+    "input": "判断1234是否能被7整除",
+    "expected_output": "1234不能被7整除，余数是2",
+    "description": "测试整除判断及余数计算",
+    "category": "统计与数学概念"
+  },
+  {
+    "input": "计算1000000乘以500000",
+    "expected_output": "1000000乘以500000的结果是500000000000",
+    "description": "测试大数乘法运算",
+    "category": "特殊数值处理"
+  },
+  {
+    "input": "3.14159保留3位小数是多少",
+    "expected_output": "3.14159保留3位小数是3.142",
+    "description": "测试小数四舍五入",
+    "category": "特殊数值处理"
+  },
+  {
+    "input": "120元打85折后是多少钱",
+    "expected_output": "120元打85折后是102元",
+    "description": "测试货币折扣计算（百分比应用）",
+    "category": "实际应用场景"
+  },
+  {
+    "input": "计算(1/2 + 1/3) × 6",
+    "expected_output": "(1/2 + 1/3) × 6的结果是5",
+    "description": "测试分数与整数的混合运算",
+    "category": "基础数学运算"
+  },
+  {
+    "input": "将3.6×10^5转换为普通数字",
+    "expected_output": "3.6×10^5转换为普通数字是360000",
+    "description": "测试科学计数法转换",
+    "category": "单位换算与转换"
+  }
+]

@@ -6,8 +6,18 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "langchain-community>=0.3.21",
+    "langchain-ollama>=0.3.2",
     "langchain-openai>=0.3.14",
     "langchain[openai]>=0.3.23",
     "langfuse>=2.60.3",
+    "langgraph>=0.3.31",
+    "pypdf>=5.4.0",
+    "python-dotenv>=1.1.0",
     "serpapi>=0.1.5",
+    "tqdm>=4.67.1",
 ]
+
+[tool.pyright]
+exclude = [".venv"]
+venvPath = "."
+venv = ".venv"

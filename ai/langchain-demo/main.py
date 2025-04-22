@@ -1,8 +1,10 @@
-from operator import call
+from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain.schema import HumanMessage, AIMessage
+from langfuse.callback import CallbackHandler
 
-from libs import langfuse_handler
+load_dotenv()
+langfuse_handler = CallbackHandler()
 
 # 初始化聊天模型，需替换为你的 API 地址和密钥
 # 若使用本地兼容 OpenAI API 的模型，修改 base_url

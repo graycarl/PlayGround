@@ -1,0 +1,452 @@
+00:00:00,000|00:00:05,260|Welcome everyone to another edition of Build Hour,
+00:00:05,260|00:00:06,500|our last of the year.
+00:00:06,500|00:00:08,160|My name is Pranav Deshpande.
+00:00:08,160|00:00:10,820|I'm on the product marketing team here at OpenAI.
+00:00:10,820|00:00:13,160|I'm joined today by my friend Max,
+00:00:13,160|00:00:15,420|who's on the solutions engineering team.
+00:00:15,420|00:00:18,400|We're going to be talking to you about how you can
+00:00:18,400|00:00:21,380|enhance recommendation systems with LLMs.
+00:00:21,380|00:00:27,400|For those of you who haven't joined Build Hour before,
+00:00:27,600|00:00:32,240|recap on the goal of Build Hour is to empower you with
+00:00:32,240|00:00:34,760|the best practices tools and AI expertise
+00:00:34,760|00:00:38,560|to help you scale your company using our APIs and models.
+00:00:38,560|00:00:41,440|Today, we're going to show you how you can actually integrate
+00:00:41,440|00:00:44,240|LLMs into different recommendation systems
+00:00:44,240|00:00:46,640|to deliver a better user experience.
+00:00:46,640|00:00:48,280|Just some quick housekeeping
+00:00:48,280|00:00:50,280|before we jump into the content.
+00:00:50,280|00:00:53,480|If you have questions, there's a question and answer
+00:00:53,480|00:00:55,760|functionality in the Zoom webinar,
+00:00:55,760|00:00:58,080|so you can just talk your questions in there.
+00:00:58,080|00:01:01,520|We'll try and answer as many of them as we can during the webinar,
+00:01:01,520|00:01:05,980|but we also have a separate Q&A session at the end of the content.
+00:01:05,980|00:01:07,720|The webinar will be recorded,
+00:01:07,720|00:01:10,360|so you'll get that once we're done here.
+00:01:10,360|00:01:12,760|Then the code that Max is going to use for
+00:01:12,760|00:01:15,920|the demo will also be shared with you once he starts presenting,
+00:01:15,920|00:01:17,800|so you can follow along if you want to.
+00:01:17,800|00:01:21,280|But with that, I'll hand it off to you, Max, to take us in.
+00:01:21,280|00:01:22,880|Awesome. Thanks, Pranav.
+00:01:22,880|00:01:25,680|Today, I'm going to walk through a few different things and
+00:01:25,680|00:01:27,120|just to set a quick agenda.
+00:01:27,120|00:01:30,780|The first I'm going to talk about LLMs and recommendations more generally,
+00:01:30,780|00:01:34,500|specifically how they play well together and the way we've seen
+00:01:34,500|00:01:36,200|customers and talk to customers about
+00:01:36,200|00:01:38,800|enhancing search and personalized recommendations.
+00:01:38,800|00:01:41,000|We'll then dive into two different examples,
+00:01:41,000|00:01:43,620|do code-alongs as well as demos on both,
+00:01:43,620|00:01:45,560|we'd call it contextual understanding.
+00:01:45,560|00:01:50,400|How do we affect the inputs as well as explainable recommendations?
+00:01:50,400|00:01:54,280|How do LLMs interact with the outputs of a recommendation system?
+00:01:54,320|00:01:57,720|We'll talk about a specific customer example that's seen a lot of
+00:01:57,720|00:02:00,040|success using this type of tactic.
+00:02:00,040|00:02:02,240|We'll then talk about some best practices and
+00:02:02,240|00:02:04,520|considerations as you're starting to build this out,
+00:02:04,520|00:02:08,760|and of course, leave plenty of time for questions and answers.
+00:02:09,000|00:02:13,440|Let's dive into the content and talk about LLMs and recommendations.
+00:02:13,440|00:02:17,240|I think the first thing I want to call out is recommendation systems are not new.
+00:02:17,240|00:02:18,440|They've been around for a long time,
+00:02:18,440|00:02:20,180|pretty much as long as everyone's been
+00:02:20,180|00:02:23,080|shopping on the Internet or interacting with some marketplace.
+00:02:23,240|00:02:26,200|This is an example from my Amazon account on Black Friday.
+00:02:26,200|00:02:27,800|I share this account with my family,
+00:02:27,800|00:02:30,720|so some of these recommendations aren't super relevant to me,
+00:02:30,720|00:02:32,600|but you get the idea that based on
+00:02:32,600|00:02:34,680|a variety of different things that they know about me,
+00:02:34,680|00:02:38,800|they've surfaced these as potential gift ideas for me.
+00:02:39,240|00:02:44,040|Recommendation systems have been a really good fit for traditional ML for a while.
+00:02:44,040|00:02:47,000|This screenshot I actually grabbed from a blog from
+00:02:47,000|00:02:50,040|Netflix on how they do their recommendation system.
+00:02:50,040|00:02:51,960|There are many parts here that are driven by
+00:02:51,960|00:02:56,320|more sophisticated ML algorithms as you can see in that screenshot.
+00:02:56,320|00:02:59,120|But the goal today is to not talk about those.
+00:02:59,120|00:03:04,480|We're focusing more about how LLMs complement and interact with this.
+00:03:04,480|00:03:10,200|If this is a space where we do have these different techniques in the ML,
+00:03:10,200|00:03:12,760|why use LLMs at all?
+00:03:12,760|00:03:17,640|I'd say there are two primary things that we're talking about here.
+00:03:17,640|00:03:20,720|One is embeddings in nearest neighbor search.
+00:03:20,840|00:03:22,560|There's a cookbook on this topic,
+00:03:22,560|00:03:24,560|we've included that in the resources in the deck.
+00:03:24,560|00:03:27,040|But using semantic search to better
+00:03:27,040|00:03:30,000|understand the user's query and match it to your product catalog.
+00:03:30,000|00:03:32,920|That's something we've seen a lot of success with customers doing,
+00:03:32,920|00:03:35,080|and that's something that's part of this demo,
+00:03:35,080|00:03:38,120|but it's not really not the focus of this demo walkthrough.
+00:03:38,120|00:03:40,880|The focus is really more on the right-hand side here,
+00:03:40,880|00:03:44,320|which will be how do we enhance inputs and outputs?
+00:03:44,320|00:03:46,680|Because we've seen that actually being what drives
+00:03:46,680|00:03:49,280|more transformational experiences and has led to
+00:03:49,280|00:03:53,400|some of the more interesting conversations I've had here at OpenAI.
+00:03:54,160|00:03:56,720|When I say inputs and outputs,
+00:03:56,720|00:03:58,120|what does that actually mean?
+00:03:58,120|00:04:03,560|I'd say the way to think about that is thinking about the ways recommendation systems,
+00:04:03,560|00:04:05,800|we've seen fall short.
+00:04:05,800|00:04:08,200|There are two main areas here.
+00:04:08,200|00:04:09,480|But first on the left-hand side,
+00:04:09,480|00:04:12,520|you can see inputs, so contextual understanding.
+00:04:12,520|00:04:14,880|Sometimes a user searches for something that maybe isn't
+00:04:14,880|00:04:17,200|a great fit for their product catalog.
+00:04:17,280|00:04:20,720|Maybe someone searches, I'm sure some of you maybe have had this experience on website,
+00:04:20,720|00:04:22,920|search for something and no results pop up,
+00:04:22,920|00:04:24,800|even though there may be some products that are actually
+00:04:24,800|00:04:27,360|relevant to what the user is trying to accomplish.
+00:04:27,360|00:04:32,640|Can we use LLMs to better understand what the end user actually wants,
+00:04:32,640|00:04:34,880|transform the query and get better results?
+00:04:34,880|00:04:37,320|More on the input side of things.
+00:04:37,320|00:04:39,040|For the output side of things,
+00:04:39,040|00:04:41,360|some of these recommendation algorithms and
+00:04:41,360|00:04:44,960|propensity scores, they can be a little bit of a black box where they have
+00:04:44,960|00:04:47,680|a numeric score and a product.
+00:04:47,680|00:04:51,320|But if I'm an end consumer and I see something recommended to me,
+00:04:51,320|00:04:53,120|like on that screenshot with Amazon,
+00:04:53,120|00:04:54,600|I don't really know why it's recommended to me,
+00:04:54,600|00:04:56,440|it's a little bit unclear.
+00:04:56,440|00:05:02,760|So how can we use LLMs to take the output of that predicted product and make it more
+00:05:02,760|00:05:05,920|personalized with more approachable language?
+00:05:05,920|00:05:09,440|So we're going to dive into each of these two topics today
+00:05:09,440|00:05:12,760|as part of the code walkthrough as well as the demo.
+00:05:13,560|00:05:16,880|So specifically in those two areas,
+00:05:16,880|00:05:19,640|how we've seen LLMs work well.
+00:05:19,640|00:05:21,480|On the left-hand side for inputs,
+00:05:21,480|00:05:23,080|there's three main things we'll talk about.
+00:05:23,080|00:05:25,360|The first is query expansion.
+00:05:25,360|00:05:27,600|So taking the user's query,
+00:05:27,600|00:05:30,080|expanding it and transforming it to better match
+00:05:30,080|00:05:34,680|the product catalog and drive a more of a personalized search experience.
+00:05:34,680|00:05:38,120|The second bucket there, which is actually related and a subset of the first,
+00:05:38,120|00:05:40,360|I would say, is query augmentation.
+00:05:40,520|00:05:44,440|Where not only are we transforming the user's query itself,
+00:05:44,440|00:05:48,720|but we're also injecting information that we know about that user into the query
+00:05:48,720|00:05:52,760|to better drive the results that we're getting from that particular search.
+00:05:52,760|00:05:56,720|And then the last, I already touched on this a little bit, semantic search,
+00:05:56,720|00:06:00,320|but instead of doing something like pure keyword matching,
+00:06:00,320|00:06:07,120|how do we use semantic search to better surface products in your catalog to end users?
+00:06:07,200|00:06:11,280|Then on the right-hand side, this LOM is the last mile.
+00:06:11,280|00:06:15,440|The way to think about that is given the outputs of some sort of traditional recommendation system,
+00:06:15,440|00:06:18,800|I'm sure a lot of you on the call are already doing a lot of this today,
+00:06:18,800|00:06:25,200|how do we use our models as kind of the last step to explain that recommendation to the user in your UI?
+00:06:25,200|00:06:28,800|And this can be done both online and offline, which we can talk about as we go through.
+00:06:31,360|00:06:35,000|Awesome. So these are interesting concepts, but what does this actually look like?
+00:06:35,000|00:06:39,360|Let's take a hypothetical example and see it in action.
+00:06:40,280|00:06:45,080|So for today's prompt, I'd say this is inspired by some real conversations we've had
+00:06:45,080|00:06:50,760|with some of our retail and media customers with similar problems that they face.
+00:06:50,760|00:06:55,920|So this company, OAI Hardware, currently they struggle with some vague searches
+00:06:55,920|00:06:59,880|and users are confused as to why certain products are recommended to them.
+00:06:59,880|00:07:01,880|They're looking at doing a few different things.
+00:07:01,880|00:07:07,440|They want to have their search better match queries to their product catalog
+00:07:07,440|00:07:14,400|and make recommendations more transparent to the user as to why it's specifically relevant to them.
+00:07:14,400|00:07:15,800|So how can we work with them?
+00:07:15,800|00:07:21,480|How can we help them create smarter, more user-friendly recommendations in their product?
+00:07:23,240|00:07:28,240|Let's first talk about the input side of things, so more of like the search experience.
+00:07:28,320|00:07:31,360|And I think when we're thinking about the search experience here,
+00:07:31,360|00:07:36,720|it's important to think about who are our customers and what they're actually trying to do.
+00:07:37,840|00:07:44,760|I'd say this is actually specifically relevant to me because of someone who's tried to do a lot of DIY projects myself.
+00:07:44,760|00:07:47,640|I find myself relying a lot on chat GPT.
+00:07:47,640|00:07:50,880|But you can see kind of there are a lot of different types of customers.
+00:07:50,880|00:07:56,240|But if we bubble them up here for this hypothetical example, there's two main areas.
+00:07:56,240|00:08:02,000|The DIY pros, people who go into a hardware store and know exactly the things that they need to pick up
+00:08:02,000|00:08:07,800|in order to complete their project, exactly what type of lumber to pick up, the different fasteners,
+00:08:07,800|00:08:09,920|all the different pieces, they kind of know what they need.
+00:08:09,920|00:08:14,560|They can go in and just buy those products to bring this project to life.
+00:08:14,560|00:08:16,800|On the right hand side are people more like me.
+00:08:16,800|00:08:20,480|These quasi DIYers, they know they want to try something.
+00:08:20,480|00:08:26,120|They have an idea of what they're looking to do, but they need some additional help to figure out what they actually need.
+00:08:26,120|00:08:31,000|In order to complete the project, like I mentioned before, I follow in that right hand bucket.
+00:08:31,000|00:08:41,120|And often I'm using chat GPT to get some ideas and figure out what are the different types of products that I would need in order to complete a project.
+00:08:41,120|00:08:51,160|So what if we could actually integrate that directly into the shopping experience instead of hopping over to chat GPT in order to actually get that that insight?
+00:08:51,160|00:08:58,120|So let's actually see what this looks like architecturally before we dive into a demo.
+00:08:58,120|00:09:02,360|This is a high level architecture. You'll see the bottom.
+00:09:02,360|00:09:13,640|I've labeled that as pre-work because we're not actually going to cover that today, but I think it's actually a really important step that we've seen a lot of customers get value out of where they have some sort of product catalog.
+00:09:13,640|00:09:17,440|This case may be like you can see a product name as well as an image.
+00:09:17,440|00:09:21,200|Maybe you also have some tags or metadata around that product.
+00:09:21,200|00:09:31,280|You can use our models to actually semantically enrich your product catalog and create these semantically rich descriptions that then you can use in a semantic search.
+00:09:31,280|00:09:35,280|So before doing this demo, that's something that we've done already.
+00:09:35,280|00:09:45,840|But I wanted to call it out because I think it's a really important step to enhance that search experience is having good descriptive metadata around your product catalog underneath.
+00:09:45,840|00:09:52,840|What we're actually going to focus more on today is the top part of this, that input side of things where we have this product data.
+00:09:52,840|00:10:01,480|We have these semantically rich descriptions in a Qtrend database and we want to talk about how do we take a user's query that's maybe a little bit more ambiguous,
+00:10:01,480|00:10:16,840|maybe more like a goal as opposed to looking for a specific product using the model to transform that query to a list of relevant categories as well as a description of those categories and why they're relevant for the user.
+00:10:16,840|00:10:21,360|And then find relevant products using semantic search within those categories.
+00:10:21,360|00:10:23,840|So kind of refining the search even further.
+00:10:23,920|00:10:33,800|So in this example, you can say I need to build a deck, what I need to do, and then getting a response back saying get the perfect boards in order to complete your deck.
+00:10:33,800|00:10:38,000|So this is kind of a very high level architecture of what this looks like.
+00:10:38,000|00:10:41,440|But now let's actually dive into the code and specifically that top part.
+00:10:41,440|00:10:47,040|And you can see both a demo as well as what this looks like underneath the hood.
+00:10:47,040|00:10:50,520|So I'm going to switch my share here.
+00:10:50,520|00:10:52,880|To this second.
+00:11:11,800|00:11:18,480|So this is just a multi page streamlet app and we'll be actually diving in and looking at what this looks like under the hood.
+00:11:18,480|00:11:25,480|But the first part we're going to focus on is this like semantic search area where I'm going in and I'm asking some questions.
+00:11:25,480|00:11:29,720|Maybe I have some sort of goal and I'm looking for a list of different products.
+00:11:29,720|00:11:32,920|A few things I want to call out here before we actually walk through this.
+00:11:32,920|00:11:39,880|This is definitely more of just a demo of the different capabilities as you're designing your own customer facing experience.
+00:11:39,880|00:11:42,760|There are a lot of different UI decisions you may make.
+00:11:42,760|00:11:48,120|You're going to see this is like a multi click search experience, which you might not necessarily want on your website.
+00:11:48,120|00:11:52,600|And we also haven't introduced here any sort of like moderation or guardrails.
+00:11:52,600|00:11:57,600|And that's something that for any sort of customer facing application is a must.
+00:11:57,600|00:12:03,840|So one is to kind of set the stage with that before we actually walk through into the demo here.
+00:12:03,840|00:12:11,600|So as I'm logging into this, let's say I have some past purchases that I've purchased from OAI hardware.
+00:12:11,600|00:12:15,800|Here's that different list and you as the as OAI hardware.
+00:12:15,800|00:12:19,920|You know this about me and the different things that I've already purchased.
+00:12:19,920|00:12:23,880|So keep that context in mind. And now I have entered this query.
+00:12:23,880|00:12:31,800|And if you go to like our website or you go to the e-commerce website and you search, typically you're kind of searching at the product level.
+00:12:31,800|00:12:35,160|You're searching for a specific type of product for this type of experience.
+00:12:35,160|00:12:39,920|It's less around a specific product and more like some sort of goal that I have.
+00:12:39,920|00:12:42,920|And how do I get maps to the right list of products from there?
+00:12:42,920|00:12:46,880|So kind of taking that and transforming it and bringing it to the right level.
+00:12:46,880|00:12:52,760|So I'll type in a query here and say something like I want to build a deck.
+00:12:52,760|00:12:58,400|Now this is something again personally relevant for me because I'm kind of working on some of these products today.
+00:12:58,400|00:13:04,400|And when I go search these on different websites, I do get like some products that are listed, but no like guidance.
+00:13:04,400|00:13:07,720|No reason why they're listed necessarily.
+00:13:07,720|00:13:15,560|And with this experience, what I'm doing when I click I want to build a deck, it's going to expand that query,
+00:13:15,560|00:13:26,400|taking the list of categories coming from my database and then come up with what are the relevant categories for me as a user in order to complete my project of building a deck.
+00:13:26,400|00:13:30,360|And as I scroll through here, a few different things that I want to call out.
+00:13:30,360|00:13:37,280|One is it's not just recommending things that are tactically like necessary to build a deck.
+00:13:37,320|00:13:44,960|But it also, since the model is smart enough to understand complementary products, it also recommends, oh, hey, you know, you're building a deck.
+00:13:44,960|00:13:47,720|Probably want to furnish that deck.
+00:13:47,720|00:13:52,000|So maybe some patio furniture would be something you're interested in as well.
+00:13:52,000|00:14:02,080|So taking that query, not just helping them complete their project, but also identifying upsell opportunities based on what that user is actually trying to do.
+00:14:02,080|00:14:08,480|The other thing I'll call out here is you'll notice in these descriptions and we'll dive into this more in the explainable recommendation step.
+00:14:08,480|00:14:14,720|But we're also incorporating some of our past purchases here into this user experience.
+00:14:14,720|00:14:21,320|So the user knows it's kind of complementary based on stuff that I've already purchased in the past.
+00:14:21,320|00:14:30,840|So, again, really personalized recommendation to me that combines both what I've purchased in the past as well as the overarching goal that I'm trying to accomplish.
+00:14:30,840|00:14:36,080|By doing the search if I want to build a deck.
+00:14:36,080|00:14:37,760|So that's the first piece of this.
+00:14:37,760|00:14:44,520|Again, taking the query, transforming it and getting it to the right level to give these sort of personalized recommendations.
+00:14:44,520|00:14:57,400|And then within those different categories, what you can do is do more of a refined focus semantic search and start to get a little bit more, again, personalized product outputs.
+00:14:57,400|00:15:03,240|So if I'm outdoor patio furniture, let's say I want to focus on I want to.
+00:15:03,240|00:15:08,400|Something. I can chill out.
+00:15:08,400|00:15:10,880|So, you know, it's something kind of ambiguous.
+00:15:10,880|00:15:13,240|What is like, what does that actually mean?
+00:15:13,240|00:15:20,480|When I click search, you'll see I get some products that are actually more comfortable, like a hammock is a really good example of that.
+00:15:20,480|00:15:25,920|And if I look in the description of a hammock here, there's nothing that says like chill.
+00:15:25,920|00:15:27,840|There's no like keyword match on that.
+00:15:27,840|00:15:39,880|But because of how we've described the hammock and we've since we're using semantic search and similarity search, the model knows to return that as something that would be interesting to me based on my search.
+00:15:39,880|00:15:47,160|So that just kind of the benefits of semantic search more generally is better understanding the user's query as opposed to just doing a pure keyword match.
+00:15:47,160|00:15:53,160|Now, if I said something like, you know, I'm hosting a dinner party.
+00:15:53,200|00:16:02,600|Then, like the results are a little bit different, where now we have something that's, you know, people can kind of sit around this, maybe sit around a fire, have this like a bistro set.
+00:16:02,600|00:16:06,080|So just an example of kind of the benefits of semantic search there.
+00:16:06,080|00:16:15,960|I think what's nice about this is because we're doing semantic search directly within a category, we're kind of combining the best of focusing on a specific category.
+00:16:15,960|00:16:25,400|But then having the query be ambiguous or flexible enough to be able to bring in these different types of products.
+00:16:25,400|00:16:28,840|So that's the quick demo of like the input side of things.
+00:16:28,840|00:16:31,680|Let's actually see what this looks like under the hood.
+00:16:31,680|00:16:42,280|And I'm going to walk through a few different pieces of the code, but you should also see this, the repo shared in the chat if you want to follow along there.
+00:16:42,280|00:16:44,440|So this is the code under the hood.
+00:16:44,440|00:16:50,120|I'm not going to walk through every single piece of it, but just the parts that I think are particularly relevant.
+00:16:50,120|00:16:57,120|As far as the repo structure, this is just a multi page streamlet application that shows kind of the two examples of inputs and outputs.
+00:16:57,120|00:16:59,640|The things to set up yourself and be aware of.
+00:16:59,640|00:17:03,440|There's a config file where you can put in some of your own credentials.
+00:17:03,440|00:17:04,720|It should just work out of the box.
+00:17:04,720|00:17:08,520|But, you know, feel free to make any changes there.
+00:17:08,520|00:17:09,520|Some helper functions.
+00:17:09,520|00:17:15,000|That's where we're actually going to be spending most of our time today, where the functions are that kind of drive this experience.
+00:17:15,000|00:17:18,320|The two different pages, the upload to QGent.
+00:17:18,320|00:17:22,400|That's what we're using to actually house the hardware stored data.
+00:17:22,400|00:17:25,000|This is the fake hardware stored data here.
+00:17:25,000|00:17:32,160|And then we also have some images generated for that hardware stored data that you would just need to unzip.
+00:17:32,160|00:17:35,560|Awesome. So as far as the prereqs here, you can see all you need is Python.
+00:17:35,560|00:17:38,800|You need an open API key in order to do the semantic search.
+00:17:38,800|00:17:44,040|And then Docker is what we're using to spin up the local QGent database.
+00:17:44,040|00:17:49,320|Awesome. So you can also see down here the different steps to start to run it.
+00:17:49,320|00:17:52,960|So if you want to run it yourself, feel free to go go ahead and do that.
+00:17:52,960|00:17:58,000|But I'm actually going to jump here into the helper function section and we'll talk about the relevant functions here.
+00:17:58,000|00:18:02,560|Maybe I'll zoom in a little bit to make it easier for folks to see.
+00:18:02,560|00:18:07,280|So on the there's a few different things I want to call out here.
+00:18:07,280|00:18:10,520|The first is this past purchases.
+00:18:10,520|00:18:17,440|If you in the application you saw, I opened up those past purchases and there's a list of different purposes and would have had in this case.
+00:18:17,440|00:18:22,120|I've just had a very hard coded those for any of you.
+00:18:22,120|00:18:27,840|Obviously, you probably have a database of these different past purchases that you would query for this information.
+00:18:27,840|00:18:36,800|But for this illustrative example, I just have some hard coded examples for what that purchase history looks like.
+00:18:36,800|00:18:43,880|Those are going to be relevant for both this part as well as the second part we'll get to, which is more like the explainable outputs.
+00:18:43,880|00:18:48,840|So the page one section here is really where we're we're going to focus on queries.
+00:18:48,840|00:18:56,480|The first is on the query expansion where we're taking the user's query and matching it to the categories.
+00:18:56,480|00:19:00,560|You'll see I actually have a hard coded listed list of those categories.
+00:19:00,560|00:19:03,800|So you would have a list of different categories in your database.
+00:19:03,800|00:19:12,480|And what we're going to do is we're actually using structured outputs to force the model to choose between those categories as opposed to leaving it kind of up to chance.
+00:19:12,480|00:19:26,440|So a good use case here for structured outputs where we have this different category, we have this different class, and then we're actually using that, creating that list and using it within this expand query for with LLM.
+00:19:27,440|00:19:30,440|So open up that expand query with LLM.
+00:19:30,440|00:19:35,440|This is the query that is run when I click like I want to build a deck search.
+00:19:35,440|00:19:38,440|And what we're doing is we're combining a few different things.
+00:19:38,440|00:19:40,440|We're passing in what's the user's query.
+00:19:40,440|00:19:44,440|We're also passing in that hard coded like past purchase history.
+00:19:44,440|00:19:47,440|And we're here's the system prompt itself.
+00:19:47,440|00:19:55,440|Essentially what we're telling it is it's kind of a planner with an access to a product catalog that has a task to do a few different things.
+00:19:55,440|00:20:06,440|One analyze the user's input and identify relevant categories, which those are things like the building lumber, the patio furniture, etc.
+00:20:06,440|00:20:14,440|Selecting those different relevant categories and then also crafting engaging descriptions as to why that category was selected.
+00:20:14,440|00:20:19,440|And then only if applicable mention how the past purchases actually contributed to that selection.
+00:20:19,440|00:20:24,440|So that's why you saw there with the different categories with the descriptions underneath them.
+00:20:24,440|00:20:28,440|They were tying in some of those past purchases that I've had.
+00:20:28,440|00:20:31,440|I then put in some rules there about how it should behave.
+00:20:31,440|00:20:35,440|I do a single shot prompt to give it an example of what that output should look like.
+00:20:35,440|00:20:40,440|And then I pass in those past purchases down here.
+00:20:40,440|00:20:45,440|So that's that's all it's doing on that kind of first step when I click search.
+00:20:45,440|00:20:50,440|Then once I do that, it returns those different categories.
+00:20:51,440|00:20:54,440|The next is actually doing a semantic search within those categories.
+00:20:54,440|00:20:57,440|And here you can see generate embeddings pretty straightforward.
+00:20:57,440|00:21:05,440|Just using our embeddings model to take the user's query and convert it to embedding.
+00:21:05,440|00:21:18,440|And then we're using this to actually query the underlying database based on what the user is looking for using that description that we've created for the product using our vision model ahead of time.
+00:21:18,440|00:21:30,440|And you can see here what we're actually doing is we're using a metadata filter to filter it just on that particular category so you can get that more targeted search.
+00:21:30,440|00:21:35,440|So those are the main parts of the of the application.
+00:21:35,440|00:21:37,440|Again, you go in, do the search.
+00:21:37,440|00:21:39,440|It expands the user's query.
+00:21:39,440|00:21:44,440|It uses the list of categories and structured outputs in order to force it to choose.
+00:21:44,440|00:21:50,440|And then within those categories, it's doing this embedding search to find the right product.
+00:21:50,440|00:22:03,440|So let's actually talk now a little bit about the other option or not other option, but the other way we've seen LMS work well with recommendation system, which is on the more the explainable output side of things.
+00:22:03,440|00:22:18,440|Let me go ahead and switch my share back to the.
+00:22:18,440|00:22:19,440|Awesome.
+00:22:19,440|00:22:20,440|Cool.
+00:22:20,440|00:22:27,440|So like I said before, we'll talk a little bit more about instead of on the input side, the output side.
+00:22:27,440|00:22:36,440|I brought this example backup of the explainable recommendations of the of my screenshot from my Amazon account.
+00:22:36,440|00:22:39,440|I don't really know why these were recommended to me.
+00:22:39,440|00:22:49,440|I just see them in my account. But I'm like, okay, I still don't really get why I have a towel that's specifically useful for me or why it would be a good gift idea for me.
+00:22:49,440|00:23:02,440|And I have hardware. They're facing a similar problem where they have a really sophisticated recommendation system that has propensity scores for each item for each user.
+00:23:02,440|00:23:06,440|And these rankings can be shown to the customer, but they feel a bit like a black box.
+00:23:06,440|00:23:10,440|How did it get to that potential number for the propensity score?
+00:23:10,440|00:23:24,440|So what if we could enhance those recommendations by combining them with information about the user to make it more personalized to them and make it more likely that they actually click on that particular item.
+00:23:24,440|00:23:39,440|And for this architecture, again, there's some like free work or things that are happening behind the scenes that we're not going to talk about today, which is the right hand side where you have some sort of propensity score algorithm that you're using that
+00:23:39,440|00:23:48,440|recommends certain products to a user. And in this case, for simplicity, we just have a product name and what that score is on a per user basis.
+00:23:48,440|00:24:08,440|We'll get into the code. In this case, we're just kind of hard coding that. But I think the key part that we're going to be walking through is the left hand side here, where we're going to be using our model to take that output, take information about the user, maybe their past purchases, their location, anything you kind of already understand about that user.
+00:24:08,440|00:24:32,440|And then describing that product to the end user and getting them excited about it. So in this example, you can see there's an Ember Glow fire pit and the part that's bolded there, I think it's really interesting where it's taking a past purchase of mine and it's combining that in order to generate or explain why this product was recommended to me.
+00:24:32,440|00:24:40,440|So that would make me more likely to actually click on it because I can understand why it was recommended to me in the first place.
+00:24:40,440|00:24:42,440|Awesome.
+00:24:42,440|00:24:57,440|So now let's dive back into the demo and see what this part looks like again. Now this is less on the search experience and more on the you have some sort of recommendations and you want those explained and more dynamic for the end user.
+00:24:57,440|00:25:11,440|Let me go ahead and switch my share one more time.
+00:25:11,440|00:25:23,440|So this page, pretty simple, but all it is is on the top you can see what are my previous purchases, same previous purchases that I had in page one.
+00:25:23,440|00:25:44,440|So I think I have these different recommended products for me. I think one thing to keep in mind with this example, again, not something that would be representative of a real UI where someone's clicking like, tell me why this is recommended to me, this would probably be something that would be kind of generated ahead of time and stored and then just surfaced to the user.
+00:25:44,440|00:25:51,440|So the JPI could be a really good way to do that at scale offline. We can talk a little bit about that later.
+00:25:51,440|00:26:05,440|But you can see here the different recommended products for me and the score and why they're recommended. And when I click on generate explanation, what's going to happen here is it's going to take the product itself.
+00:26:05,440|00:26:16,440|It's going to take information about me and it's going to have some sort of guidelines around what it should say the length, the tonality, etc. to generate this explanation.
+00:26:16,440|00:26:21,440|I'll try this vacuum cleaner to start.
+00:26:21,440|00:26:30,440|So I generated it for this one and you can see it tied in a few different things that I've already purchased to that recommendation.
+00:26:30,440|00:26:40,440|So you can control how explicitly you want the model to say like specific items you've purchased in the past or just use that information to generate a personalized recommendation.
+00:26:40,440|00:26:52,440|That's something you can kind of control in the prompt. But I think this is a really good example of like a difference between that screenshot I showed in the slides where it just was products without any sort of explanation.
+00:26:52,440|00:27:03,440|And now these products that we've used the model to generate this more engaging explanation of why this product would specifically be great for me.
+00:27:03,440|00:27:13,440|So think of this again. I think the LLM is the last mile is a good way to think about this type of use case.
+00:27:14,440|00:27:23,440|So we'll dive into the code now and see what this looks like. It's pretty straightforward, but there's really two main functions that I want to call out here.
+00:27:23,440|00:27:34,440|The first is on the recommendations themselves, similarly to the list of previous purchases.
+00:27:34,440|00:27:46,440|I'm hard coding this just as to show an example of something that the model is not doing. So you probably or you maybe have some sort of propensity recommendation score that you're doing already.
+00:27:46,440|00:27:51,440|Think of this like these being dynamically generated for a user.
+00:27:51,440|00:28:02,440|So I can see the product itself, the category, and then like what's that like score the output of that propensity scoring algorithm.
+00:28:02,440|00:28:07,440|But what's really happening when I click on that button to generate the explanation.
+00:28:07,440|00:28:24,440|This is what is actually being run under the hood. Again, like I said before, this is something I'm doing in real time for the purposes of the demo, something that you could do offline and then just store and have available to the user as they're interacting with your website or wherever they're interacting.
+00:28:24,440|00:28:36,440|You can see here the prompt and your product recommendation assistant. We've given what's the product that was recommended. What was the category of that product? You can give any sort of other information that you want.
+00:28:36,440|00:28:52,440|Give some information about what the user previously purchased and then give it some guidance in order to get the user excited about it. You'll notice I have pretty limited here in terms of like controlling the tonality.
+00:28:52,440|00:29:06,440|You can both through the prompt here control that tonality a bit more and there are other techniques that you can use or to actually get to in the customer example to really make this output feel like your particular.
+00:29:06,440|00:29:10,440|Company guidelines or branding.
+00:29:10,440|00:29:28,440|So those are the two main functions for this example again. Well, it's pretty straightforward like from a coding perspective. I think this can be a really powerful way to take outputs that you have from any sort of propensity scoring algorithm and make them more personable and approachable for end users at scale.
+00:29:28,440|00:29:39,440|The other thing I'll call out here I'm using for over this. This could be something that you could use for a mini for other models as well.
+00:29:40,440|00:29:57,440|So those are the two main kind of code walkthroughs and demos again you have access to this in the repo so you should be able to kind of spin this up yourself play around with it and and dive into the code a bit more on your own.
+00:29:57,440|00:30:25,440|So with that, I'm going to quickly jump back to the deck and we will talk a little bit about where we've seen this be successful.
+00:30:25,440|00:30:39,440|So to recap here I'd say we've talked about two things. We've talked about how do we use LMS on the input side of things more on the search when the user search isn't a great fit for the product catalog.
+00:30:39,440|00:30:47,440|How do we one better match that search to the product catalog itself using LMS driving more personalized experience.
+00:30:47,440|00:31:00,440|How do we inject user information into that query to make it even more enhanced from a personalization perspective and then how do we use semantic search to better drive the search experience beyond just pure keyword search.
+00:31:00,440|00:31:15,440|And then on the right hand side we talk a little bit about outputs. If you're doing a lot of this type of work today where you're generating these recommendations but it does feel a bit like a black box using our models as the last mile given that output.
+00:31:15,440|00:31:27,440|How do we make it more approachable. How do we describe it to the user and get them excited about purchasing the product as opposed to just having a product surface onto the website.
+00:31:27,440|00:31:34,440|And if we talk about the specific ways that we did these things that query expansion.
+00:31:34,440|00:31:44,440|We took that more ambiguous query. I want to build a deck and we transform that into a list of relevant categories and an explanation for why those categories are relevant.
+00:31:44,440|00:31:58,440|So then me as a user I can dive into the right category and I know what are the things I have already. What are the things I don't and that's already incorporated in the in the explanation itself.
+00:31:58,440|00:32:13,440|Here we what we've also done on the query augmentation side of things is we've injected those previous purchases in order to make those explanations more approachable and also to remind the user about things that maybe they already have that compliment.
+00:32:13,440|00:32:30,440|Some of the purchases that they're going to make so that previous purchase is just one example any information you have about that user that could drive their spending habits could be put into that prompt and then used to generate that sort of explanation.
+00:32:30,440|00:32:45,440|And then the last one on that side the semantic search. You'll notice when I searched like something to chill in versus hosting a dinner party. Those were not things that are necessarily like keyword matches for the descriptions in of those items.
+00:32:45,440|00:32:56,440|But because the model better semantically understands the relation between the search and the embedded description using a similarity search.
+00:32:56,440|00:33:08,440|You're able to get better products that are surfaced based on the user's query regardless of whether it's something very specific or something more ambiguous like hosting a dinner party.
+00:33:08,440|00:33:11,440|Then on the right hand side with the outputs.
+00:33:11,440|00:33:25,440|We also used the LMS the last mile where we had that hard coded propensity score and different products that were recommended to me and we use the model to generate in real time an explanation for each of those recommended products.
+00:33:25,440|00:33:40,440|Incorporating user profile information and past purchase history. So again, making those really engaging and making them better explains the end user.
+00:33:40,440|00:33:49,440|So as far as where we've seen customers. I've had a lot of different conversations with customers and in retail and media variety of different places.
+00:33:49,440|00:34:02,440|I think this customer story with indeed is a really good example of this in action where they used our models to improve their invite to apply feature by adding personalized approachable language generated by a fine tuned model.
+00:34:02,440|00:34:11,440|So their primary goal is instead of matching like an ambiguous search like I want to build a deck to the list of products. It's more like matching users to different jobs.
+00:34:11,440|00:34:22,440|But maybe the initial search isn't the right way to do that. So they saw by enhancing the description and enhancing what actually comes back from the model which you can see some examples on the right.
+00:34:22,440|00:34:33,440|They saw 20% uplift and applications and a 13% uplift and downstream success by just using the models to kind of personalize that outreach of that invite to apply.
+00:34:33,440|00:34:45,440|I think an important part about this is they also because they used a fine tune model they're able to better control for tonality and other pieces in my demo. I just put in the prompts.
+00:34:45,440|00:34:59,440|You know, be concise, be playful to drive that tonality. But there are a variety of different techniques you can use to really make sure it fits your branding and your tonality and fine tuning a model is an example of the technique here that indeed is.
+00:34:59,440|00:35:20,440|So yeah, this is on our website. So feel free to read more about the use case there. But again, I think a really good example of using the model as that like last mile explanation to the end user to make it more approachable and a proven success of it actually driving an uptick in clicks and downstream success as well.
+00:35:20,440|00:35:22,440|Awesome.
+00:35:22,440|00:35:37,440|So there are a few different best practices, I would say that are important to think about if you're considering using LMS in some sort of customer facing or some sort of recommendation type of workflow.
+00:35:37,440|00:35:47,440|I think one thing to keep in mind here. Our goal here is not to give you necessarily like UI advice. I on that demo, like multi click search experience or like generating explanations in real time.
+00:35:47,440|00:35:59,440|Those are more just examples of the functionality as opposed to the user experience. But here are some things that when I've been talking to customers have come up that I've advised them on.
+00:35:59,440|00:36:15,440|The first is like ensuring business value. I think you want to make sure what you're building is actually like solves a problem and it drives a new valuable experience. We've seen people build these sorts of like a shopping assistance or things like that.
+00:36:15,440|00:36:28,440|That maybe haven't had the sort of business justification backing. So you want to make sure that what you're doing actually enhances what the user is trying to accomplish at the end of the day and conventional search works well for a lot of different use cases.
+00:36:28,440|00:36:43,440|So just because we're kind of showing some examples here doesn't mean it's always the right fit for a customer facing website or some sort of product search. It really depends on understanding the user and understanding the outcomes you're looking to drive.
+00:36:44,440|00:36:59,440|The second piece is intelligence first and latency optimization. I think especially for something that's like customer facing having really good latency is a key factor because customers have pretty low tolerance for slow latency.
+00:36:59,440|00:37:09,440|But what we've seen this actually go sideways sometimes is people are optimizing for latency really early in the process without actually validating that the model can do what they want.
+00:37:09,440|00:37:21,440|So then they optimize optimize optimize spend all this time and then realize that the user experience that they're driving isn't necessarily one that works well with models or isn't really like an LLM problem to begin with.
+00:37:21,440|00:37:33,440|So then there's that kind of like wasted effort up front with optimizing for latency. So I'd say keep that in mind as you're starting to build these out of make sure the models can actually do what you hope they can do.
+00:37:33,440|00:37:37,440|And then there are a variety of different techniques you can use to optimize for latency after the fact.
+00:37:37,440|00:37:47,440|Things like using smaller models, distilling a model, moving from online to offline and using things like the batch API to pre process a lot of these recommendations.
+00:37:47,440|00:37:57,440|Using prompt engineering and modifying your prompt to leverage things like prompt caching. There are a lot of different techniques you could potentially use there. We have some guidance on optimizing LLMs for latency.
+00:37:58,440|00:38:11,440|That is definitely would recommend reading as well, but that's just something to keep in mind is make sure the models can do what you want them to do and then use the variety of different types of techniques that we have to optimize for latency.
+00:38:12,440|00:38:26,440|The last thing here, and I think this is a really important call out where we've seen customers come and try to kind of do entire recommendation systems with LLMs is understanding what LLMs are good at versus more like narrow or traditional ML.
+00:38:26,440|00:38:37,440|LLMs are not a replacement for these sort of recommendation systems that are designed more to analyze large amounts of data. LLMs can kind of enhance search on the inputs.
+00:38:37,440|00:38:51,440|As well as on semantic search. They can be that last mile delivery on the outputs, but all of these sort of techniques to analyze a bunch of data come up with propensity scores have been a really good fit for traditional ML for a long time and just compliment LLMs nicely.
+00:38:51,440|00:38:58,440|So I would say pairing them together is a really powerful experience as opposed to just doing one or the other.
+00:39:00,440|00:39:18,440|Awesome. So that those are really the main things I wanted to walk through today. I know we have a good amount of time left. I think the for the remainder of the time we can talk do more Q&A. The other thing I'll call out is we do have some resources in this deck that we'll be happy to share with after the call.
+00:39:19,440|00:39:20,440|All right.
+00:39:22,440|00:39:33,440|Well, thanks, Max. That was amazing. I have to host a Christmas party next week and I don't have any decorations. So I wish I had something like this handy to just get a list of things I need to buy.
+00:39:33,440|00:39:44,440|So I can definitely see these patterns being super useful in especially these retail use cases. We've had quite a few questions come in. So let's just go through them one by one.
+00:39:45,440|00:39:59,440|This is actually an interesting one because we didn't cover it in too much detail in your demos, but I think it's like a key component of this whole experience. The whole approach to data enrichment and embedding.
+00:40:00,440|00:40:12,440|You know, we've had a question basically trying to figure out how do you actually get your data, your catalog in a place where it can actually like map the characteristics of a particular object.
+00:40:13,440|00:40:25,440|So the specific question is like, if I want to have durable outdoor seating options, how do I match that particular attribute to like weather resistant material in my inventory or something along those lines?
+00:40:26,440|00:40:35,440|How do you go about improving or enriching the data that you have to better work with your semantic search?
+00:40:36,440|00:40:42,440|Yeah, it's a good question. I'd say a few things. One on the data enrichment side.
+00:40:43,440|00:40:56,440|Traditionally with search, there's been a lot of you need to kind of have a very structured data set and really have like specific tags that you're filtering on or categories, whatever it may be.
+00:40:57,440|00:41:08,440|I think the nice thing with semantic search is really you just need to generate like text, unstructured text that describes the item. And then that matches nicely with more broad semantic search.
+00:41:09,440|00:41:13,440|So in the example that I was showing before, like those are just kind of loose descriptions.
+00:41:14,440|00:41:25,440|But then when you're doing the similarity score matching, you leverage the model's ability to do understand the user's query, understand the description and do the proper matching from there.
+00:41:26,440|00:41:37,440|So I'd say like it's a good question. I don't have specific advice on like that connection, but I think it's important to think about the difference between like traditionally we've had these product category logs that need to be have be very structured.
+00:41:38,440|00:41:46,440|I still think that's very important, but there's this other piece of it of having this like unstructured high level description and then doing semantic search on that.
+00:41:47,440|00:41:59,440|That can be really powerful for search type of use cases. You could use vision, right? Yeah. To generate those descriptions. Yeah. And that's actually what we did in the dummy data set that you'll see in the repo.
+00:42:00,440|00:42:12,440|I created a product name and generated a dolly image for each of them and then put that through the vision model to generate the descriptions with some information. So very cool.
+00:42:14,440|00:42:24,440|With the Indeed case study, there's a question specifically about that. Do you have a sense for like the corpus of like just the general corpus of tokens they were working with?
+00:42:25,440|00:42:36,440|Or in general, like with some of these customers that you've spoken to, like what is the general size of some of this information that they need to sort of build into a scalable system?
+00:42:37,440|00:42:53,440|Yeah, it's a good question. I don't really have a good sense for like the exact level of scale. But I'll say like offline is definitely your friend for a lot of these. Like the combination of using like the batch API and using something like
+00:42:54,440|00:43:05,440|a fine tune model or distilled model can really keep the like token costs or the costs down more generally. And then storage is cheap. So once you have those descriptions and storing them and surfacing them. So
+00:43:06,440|00:43:11,440|I don't have a good answer, but we'll just promote kind of the batch API to do a lot of this work as well.
+00:43:12,440|00:43:23,440|On that note, specifically around, as you mentioned, fine tuning, we've had a question coming around. How do you actually get your get the model to be more confident in its recommendation?
+00:43:24,440|00:43:37,440|This this user has a situation where they're sometimes struggling to get 4.0 to make a confident recommendation. It just outlines the pros and cons of things.
+00:43:38,440|00:43:43,440|This is something you can do with prompting when this fine tuning come into the picture. Love to feel free to speak to that.
+00:43:44,440|00:43:56,440|Yeah, I think it kind of ties into like what I've seen with evals as well where if you're doing like a numeric ranking or something, it kind of gives very similar numbers a lot because it can see like the pros and cons of each.
+00:43:57,440|00:44:09,440|We have a good cookbook on this on like the eval side of using more like categorization as opposed to like a numeric ranking and that using that as the thing to judge on.
+00:44:10,440|00:44:22,440|So I think that's something that I would look in. I think it's evaluating LLMs with brain trust, I believe is the name of the cookbook. But I think that one gives a good example of using like the LLM as the judge and
+00:44:23,440|00:44:30,440|putting into different like categories as opposed to doing like a numeric ranking because then the model can kind of see pros and cons of each.
+00:44:31,440|00:44:35,440|So it's like kind of using a separate model call, understanding the different rankings and then putting that back in.
+00:44:36,440|00:44:55,440|One question on data enrichment. Have you seen any benefits to turning to basically using JSON data to structure the corpus with tags and more structured information as opposed to maybe having like a unstructured sort of pros description of each item?
+00:44:56,440|00:45:10,440|Yeah, I think like there definitely can work well in tandem. I think even in that demo, there's a good example of that where right I did the search. It first gave me the categories and then I did the semantic search within those categories.
+00:45:11,440|00:45:20,440|If I had just immediately done the search without doing filtering on the category first, that would have given me a different list of items that maybe I actually wasn't that interested in.
+00:45:20,440|00:45:32,440|So I'm kind of using the combination of the structured data and like the JSON of the categories with the unstructured data of just the general description. So I would say there's definitely a place for both.
+00:45:33,440|00:45:44,440|And it's important to have both the kind of structured side of things as well as the unstructured. And then you can also use the model to help you figure out gaps in your structured data.
+00:45:44,440|00:45:55,440|We've seen some good success with that, especially with our reasoning model to understand the data, figure out where there are different gaps and then kind of suggest improvements.
+00:45:56,440|00:46:06,440|This next question is interesting. I think it also like hints at a topic that we didn't quite touch on, but I think is important around like guardrails on model generations.
+00:46:06,440|00:46:16,440|And not specifically in the context of safety, but more in the context of like, how do you get the model to not generate something that's not in your inventory, right?
+00:46:17,440|00:46:24,440|You don't want it to maybe just go off and try to please the user and come up with something that doesn't exist. What are some ways to mitigate that?
+00:46:25,440|00:46:34,440|Yeah, it's a good question. I'd say a few different things. One technique I did not use at all in this demo is function calling.
+00:46:34,440|00:46:48,440|So instead of like giving the model a list of different categories, we actually have the model like execute, not execute, but surface that it needs to execute a function and then go query a database for those products.
+00:46:49,440|00:47:03,440|So those products are coming back from the function call. That's a potential practice you can use. The other thing, which I showed a little bit in the demo, was like on the structured output side of things to prevent it from coming up with different categories and hallucinating.
+00:47:04,440|00:47:14,440|So using structured output to give it here the different categories you can choose from. Then one, I didn't need to include that in the prompt at all. I just said you have different categories, use them.
+00:47:15,440|00:47:22,440|So that kind of helped on the token side of things there. And then two, reduces the risk of hallucination directly from there.
+00:47:24,440|00:47:25,440|Yeah, those are the two things I would say.
+00:47:26,440|00:47:39,440|Well, maybe in this question you can just answer by going to the relevant question in the code, but I think this user wants to just get a sense for how you combine semantic search with the recommendation score.
+00:47:40,440|00:47:43,440|So I think it might help to just show that piece in the code I know.
+00:47:44,440|00:47:48,440|Yeah, absolutely. Let me share the right tapping end.
+00:47:55,440|00:48:11,440|So as far as when we're thinking about the propensity recommendation, I guess the semantic search and the propensity recommendation are actually two different experiences in this demo.
+00:48:12,440|00:48:19,440|The first, you can see we have the past purchases. What we're doing is we're feeding that into the model.
+00:48:20,440|00:48:25,440|And we're basically giving it here the list of the past purchases, what this user's had.
+00:48:27,440|00:48:33,440|And in this prompt, we're telling it what those past purchases are down here.
+00:48:35,440|00:48:39,440|And we're just giving a single shot example. So we're doing this pretty much all in the prompt.
+00:48:40,440|00:48:49,440|Or we're passing in different inputs. You'll notice for this, it's just the user's query, which is dynamically coming from the Streamlight app and their past history.
+00:48:50,440|00:48:58,440|But you could make this even more generic, just have user profile here, and then you're just passing in information about the user and letting the model figure out what's relevant and what's in that.
+00:48:59,440|00:49:08,440|As far as generating the explanation of the recommendation, if that was more of the question, all we're doing here is we have this list of past purchases.
+00:49:09,440|00:49:14,440|We have a list of recommended products that you may have your own system that's generating these scores.
+00:49:15,440|00:49:22,440|The model actually is not doing anything with generating scores here. It's just using that as an input in order to generate the explanation.
+00:49:23,440|00:49:34,440|So we have this score, and then we have this model, this prompt. Basically, all we're doing is we're telling the model, what was the product that was recommended to the user? What was the category?
+00:49:34,440|00:49:41,440|What is the person purchased in the past? Combine all of those and get the user excited about this particular product.
+00:49:42,440|00:49:54,440|So it's just this single call here that just takes those as inputs. And this is all with the assumption that you've already generated that propensity score using another technology outside of Oopinaya.
+00:49:55,440|00:49:58,440|And that's the bridge between traditional ML and LLMs.
+00:49:58,440|00:50:26,440|Yeah, we've seen it. The model, we've seen good success with LLMs as this last mile. This is a recommendation use case, but even across the board, if you have different intelligence systems or other things that you're doing, putting the model as this layer on top of all the traditional ML you're working just to explain things to users, whether those are your customers, whether those are internal employees. We've seen a lot of success with that sort of combination.
+00:50:27,440|00:50:47,440|On that topic of guardrails, there's a follow up. If the catalog items are out of stock, is there a way to handle that other than simply eliminating it from the output list? Maybe like with function calling, maybe there's a way to like have an intermediate step where it goes off and checks if the right idea.
+00:50:48,440|00:51:02,440|I think that that's something that would be like handled somewhere in your code offline, whether it's like gathering the current inventory, getting the list of products that are available and just providing those to the model.
+00:51:03,440|00:51:16,440|If you just give the model the list of products without giving it the information of whether of the inventory, then the model won't be able to tell. But if you're handling that somewhere in your code before it actually hits the model, that would probably be my recommended practice here.
+00:51:18,440|00:51:28,440|Awesome. Yeah, and then there's a follow up that's around the propensity score. It's not modified by the intent of the search query, right?
+00:51:29,440|00:51:41,440|Correct. Yeah, those are two separate things here. Yeah, that's an interesting one. And if that's something that you are doing yourself, that can be fed back into the model.
+00:51:42,440|00:51:51,440|So I guess these two are like isolated experiences in this demo, but they don't have to be for your application or for how you're doing things.
+00:51:53,440|00:52:08,440|Awesome. I think that's it in terms of questions. Unless you have any more in the next couple of minutes, we'll wrap up here and share the recording with you along with some of the resources we presented.
+00:52:08,440|00:52:17,440|We're so glad you could join us for our final build hour of the year. We'll see you again in the next year and happy holidays. Thanks for joining.
+00:52:18,440|00:52:19,440|Yeah, thanks everyone.

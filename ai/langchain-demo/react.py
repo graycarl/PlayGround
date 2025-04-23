@@ -35,7 +35,6 @@ class SafeMathTool(BaseTool):
 llm_math = SafeMathTool()
 tools = [llm_math]
 
-# 初始化大语言模型，这里使用 OpenAI，你可以替换成兼容的模型
 llm = ChatOpenAI(
     model="Qwen/Qwen2.5-72B-Instruct",
     openai_api_base="https://api.siliconflow.cn/v1",
@@ -43,7 +42,6 @@ llm = ChatOpenAI(
     temperature=0
 )
 
-# 初始化 REACT 范式的 Agent
 agent = create_react_agent(llm, tools)
 
 @observe

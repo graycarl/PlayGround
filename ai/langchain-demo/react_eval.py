@@ -2,16 +2,15 @@
 Run evaluation for react model
 """
 import argparse
-import logging
 import dotenv
-import langfuse
+from langfuse import Langfuse
 from langchain_openai import ChatOpenAI
-from langchain.schema import SystemMessage, HumanMessage, AIMessage
+from langchain.schema import SystemMessage, HumanMessage
 
 import react
 
 dotenv.load_dotenv()
-langfuse = langfuse.Langfuse()
+langfuse = Langfuse()
 llm = ChatOpenAI(
     model="Qwen/Qwen2.5-32B-Instruct",
     openai_api_base="https://api.siliconflow.cn/v1",
@@ -19,16 +18,29 @@ llm = ChatOpenAI(
     temperature=0
 )
 
+def print_colored(text: str, color: str):
+    """Prints the text in the specified color."""
+    colors = {
+        "red": "\033[91m",
+        "green": "\033[92m",
+        "yellow": "\033[93m",
+        "blue": "\033[94m",
+        "magenta": "\033[95m",
+        "cyan": "\033[96m",
+        "reset": "\033[0m"
+    }
+    print(f"{colors.get(color, colors['reset'])}{text}{colors['reset']}")
+
 
 def run_dataset(dataset_name: str, run_name: str):
     dataset = langfuse.get_dataset(dataset_name)
     for item in dataset.items:
-        logging.info(f">>>> Evaluating item: {item.id}")
+        print_colored(f">>>> Evaluating item: {item.id}", "blue")
         with item.observe(run_name=run_name) as trace_id:
-            logging.info(f"Input: {item.input}")
+            print_colored(f"Input: {item.input}", "green")
             response = react.chatbot_response(item.input)
-            logging.info(f"Response: {response}")
-            logging.info(f"Expected output: {item.expected_output}")
+            print_colored(f"Response: {response}", "green")
+            print_colored(f"Expected output: {item.expected_output}", "green")
 
             # checks if output is semantically similar to the expected value,
             # using a cosine similarity threshold.
@@ -52,13 +64,11 @@ def get_item_score(expected_output, output):
         HumanMessage(content=f"expected_output: {expected_output}\n\noutput: {output}"),
     ]
     response = llm(messages)
+    assert isinstance(response.content, str)
     return float(response.content.strip()[:4])
 
 
 if __name__ == "__main__":
-    # Set up logging
-    logging.basicConfig(level=logging.INFO)
-
     parser = argparse.ArgumentParser(description="Run evaluation for react model")
     parser.add_argument("dataset_name", type=str, help="Name of the dataset")
     parser.add_argument("run_name", type=str, help="Name of the run")

@@ -36,10 +36,12 @@ llm_math = SafeMathTool()
 tools = [llm_math]
 
 llm = ChatOpenAI(
-    model="Qwen/Qwen2.5-72B-Instruct",
+    model="deepseek-ai/DeepSeek-V3",
+    # model="Qwen/Qwen2.5-72B-Instruct",
     openai_api_base="https://api.siliconflow.cn/v1",
     openai_api_key="sk-nsswwpfvuompvcqcseqsfbhjysigfiiybqyeznikustuhucq",
-    temperature=0
+    temperature=0,
+    streaming=False
 )
 
 agent = create_react_agent(llm, tools)

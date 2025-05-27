@@ -8,20 +8,22 @@ langfuse_handler = CallbackHandler()
 
 # 使用最新LangChain API初始化聊天模型
 chat = ChatOpenAI(
-    model="Qwen/Qwen2.5-72B-Instruct",
+    model="deepseek-ai/DeepSeek-V3",
+    # model="Qwen/Qwen2.5-72B-Instruct",
     base_url="https://api.siliconflow.cn/v1",
-    api_key="sk-nsswwpfvuompvcqcseqsfbhjysigfiiybqyeznikustuhucq",
+    api_key="sk-fbcjqjtahzilvryntnwmxcrhlyinpzbukgcmrkfgeytgijxn",
     temperature=0
 )
 
 def main():
     while True:
+        # sample:  "年薪 100w 对应时薪是多少？"
         user_input = input("你: ")
         if user_input.lower() == 'q':
             break
-        
+
         # 使用最新API调用方式
-        response = chat.invoke([HumanMessage(content=user_input)], 
+        response = chat.invoke([HumanMessage(content=user_input)],
                              config={"callbacks": [langfuse_handler]})
         print(f"机器人: {response.content}")
 
